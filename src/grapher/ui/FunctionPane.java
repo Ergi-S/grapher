@@ -3,6 +3,7 @@ package grapher.ui;
 import java.util.Optional;
 
 import grapher.fc.Function;
+import grapher.fc.FunctionFactory;
 import javafx.application.Application.Parameters;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -15,16 +16,19 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.util.StringConverter;
 
 public class FunctionPane extends Pane {
 
@@ -63,20 +67,24 @@ public class FunctionPane extends Pane {
 
 		lv.setEditable(true);
 		
-//		lv.setCellFactory(TextFieldListCell.forListView(new
-//		StringConverter<Function>() {
-//		
-//		@Override public String toString(Function f) { return f.toString(); }
-//		
-//		@Override public Function fromString(String fname) { return
-//		FunctionFactory.createFunction(fname); } }));
-//		
-//		lv.setOnEditCommit(new EventHandler<ListView.EditEvent<Function>>() {
-//		
-//		@Override public void handle(EditEvent<Function> event) { int idx =
-//		event.getIndex(); lv.getItems().set(idx, event.getNewValue());
-//		m_canvas.removeFunction(idx); m_canvas.addFunction(idx, event.getNewValue());
-//		} });
+		fNameCol.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Function>() {
+			@Override
+			public String toString(Function f) {
+				return f.toString();
+			}
+			@Override
+			public Function fromString(String fname) {
+				return FunctionFactory.createFunction(fname);
+			}
+		}));
+		fNameCol.setOnEditCommit(new EventHandler<CellEditEvent<Funs,Function>>() {
+			@Override
+			public void handle(CellEditEvent<Funs, Function> event) {
+				int idx = event.getTableView().getItems().indexOf(event.getRowValue());
+				lv.getItems().get(idx).setFname(event.getNewValue());;
+				m_canvas.replaceFunction(idx, event.getNewValue());				
+			}
+		});
 		 
 	}
 
@@ -134,12 +142,14 @@ public class FunctionPane extends Pane {
 
 	private void plusDialog(ObservableList<Funs> names) {
 		TextInputDialog dialog = new TextInputDialog();
-		dialog.setTitle("plus");
-		dialog.setContentText("func : ");
+		dialog.setTitle("Ajouter une fonction");
+		dialog.setHeaderText("Ajouter une fonction");
+		dialog.setContentText("Fonction à ajouter:");
 		Optional<String> f = dialog.showAndWait();
 		if (f.isPresent()) {
 			if (f.get().equals("")) {
-				Alert alert = new Alert(AlertType.INFORMATION, "Argument Vide");
+				Alert alert = new Alert(AlertType.INFORMATION, "Raison: Expression Vide");
+				alert.setHeaderText("La fonction n'a pas pu s'ajouter");
 				alert.showAndWait();
 				return;
 			} else
@@ -147,7 +157,8 @@ public class FunctionPane extends Pane {
 					m_canvas.addFunction(f.get());
 					names.add(m_canvas.functions.get(m_canvas.functions.size() - 1));
 				} catch (Exception e) {
-					Alert alert = new Alert(AlertType.ERROR, "Fonction Invalide");
+					Alert alert = new Alert(AlertType.ERROR, "Raison: Expression Invalide");
+					alert.setHeaderText("La fonction n'a pas pu s'ajouter");
 					alert.showAndWait();
 					return;
 				}
@@ -157,7 +168,9 @@ public class FunctionPane extends Pane {
 	private void minusDialog(ObservableList<Funs> names) {
 		int index = names.size() - 1;
 		if (index < 0) {
-			Alert alert = new Alert(AlertType.INFORMATION, "Pas de fonctions a enlever");
+			Alert alert = new Alert(AlertType.INFORMATION, "Raison: Pas de fonctions a enlever");
+			alert.setTitle("Erreur");
+			alert.setHeaderText("Impossible d'enlever une fonction");
 			alert.showAndWait();
 			return;
 		}

@@ -135,7 +135,6 @@ public class GrapherCanvas extends Canvas {
 			if (m_boldIndex != -1 && m_boldIndex < functions.size() && functions.elementAt(m_boldIndex).getFname() == f)
 				gc.setLineWidth(2 * lw);
 
-			System.out.println(fn.getFcol().getValue());
 			gc.setStroke(fn.getFcol().getValue());
 			gc.strokePolyline(Xs, Ys, N);
 			gc.setLineWidth(lw);
@@ -275,21 +274,11 @@ public class GrapherCanvas extends Canvas {
 		redraw();
 	}
 
-	protected void addFunction(int index, String f) {
-		functions.add(index, new Funs(FunctionFactory.createFunction(f), this));
+	protected void replaceFunction(int index, Function f) {
+		functions.get(index).setFname(f);
 		redraw();
 	}
-
-	protected void addFunction(int index, Function fn) {
-		functions.add(index, new Funs(fn, this));
-		redraw();
-	}
-
-	protected void addFunction(int index, Funs fn) {
-		functions.add(index, fn);
-		redraw();
-	}
-
+	
 	protected void removeFunction(int index) {
 		functions.remove(index);
 		redraw();

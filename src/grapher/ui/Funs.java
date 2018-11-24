@@ -28,6 +28,10 @@ public class Funs {
 	public Function getFname() {
 		return fname;
 	}
+	
+	public void setFname (Function f) {
+		fname = f;
+	}
 
 	public ColorPicker getFcol() {
 		return fcol;

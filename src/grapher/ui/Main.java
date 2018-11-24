@@ -7,14 +7,12 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-/* ceci est un commentaire */
-
 public class Main extends Application {
 	public void start(Stage stage) {
 		GrapherCanvas gc = new GrapherCanvas(getParameters());
 		FunctionPane fp = new FunctionPane(getParameters(), gc);
 		SplitPane root = new SplitPane(fp.getLeft(), gc);
-		root.setDividerPositions(0.25);
+		root.setDividerPositions(0.4);
 		
 		MenuBar menubar = new MenuBar(fp.getExpression());
 		BorderPane total = new BorderPane(root);

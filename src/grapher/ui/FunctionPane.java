@@ -6,19 +6,15 @@ import grapher.fc.Function;
 import javafx.application.Application.Parameters;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToolBar;
@@ -29,55 +25,33 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.util.Callback;
 
 public class FunctionPane extends Pane {
 
 	BorderPane m_left;
 	ToolBar m_tb;
-	GrapherCanvas m_canvas;
+	public GrapherCanvas m_canvas;
 	Menu m_exp;
-
-	public class Funs {
-		Function fname;
-		ColorPicker fcol;
-
-		public Funs(Function fnm) {
-			fname = fnm;
-			fcol = new ColorPicker(Color.BLACK);
-		}
-
-		public Function getFname() {
-			return fname;
-		}
-
-		public ColorPicker getFcol() {
-			return fcol;
-		}
-	}
 
 	public FunctionPane(Parameters params, GrapherCanvas canvas) {
 		m_canvas = canvas;
 
 		TableView<Funs> lv = new TableView<Funs>();
 
-		for (Function f : m_canvas.functions) {
-			Funs af = new Funs(f);
-			lv.getItems().add(af);
-		}
+		for (Funs f : m_canvas.functions)
+			lv.getItems().add(f);
 
 		TableColumn<Funs, Function> fNameCol = new TableColumn<Funs, Function>("Expression");
 		fNameCol.setCellValueFactory(new PropertyValueFactory<>("fname"));
 		TableColumn<Funs, Color> fcolCol = new TableColumn<Funs, Color>("Couleur");
 		fcolCol.setCellValueFactory(new PropertyValueFactory<>("fcol"));
-
 		lv.getColumns().setAll(fNameCol, fcolCol);
 
 		lv.getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {
 			@Override
 			public void invalidated(Observable observable) {
 				if (lv.getSelectionModel().getSelectedItem() != null)
-					m_canvas.bold(lv.getSelectionModel().getSelectedItem().getFname());
+					m_canvas.bold(lv.getSelectionModel().getSelectedItem());
 			}
 		});
 
@@ -88,22 +62,22 @@ public class FunctionPane extends Pane {
 		m_left.setBottom(m_tb);
 
 		lv.setEditable(true);
-		/*
-		 * lv.setCellFactory(TextFieldListCell.forListView(new
-		 * StringConverter<Function>() {
-		 * 
-		 * @Override public String toString(Function f) { return f.toString(); }
-		 * 
-		 * @Override public Function fromString(String fname) { return
-		 * FunctionFactory.createFunction(fname); } }));
-		 * 
-		 * lv.setOnEditCommit(new EventHandler<ListView.EditEvent<Function>>() {
-		 * 
-		 * @Override public void handle(EditEvent<Function> event) { int idx =
-		 * event.getIndex(); lv.getItems().set(idx, event.getNewValue());
-		 * m_canvas.removeFunction(idx); m_canvas.addFunction(idx, event.getNewValue());
-		 * } });
-		 */
+		
+//		lv.setCellFactory(TextFieldListCell.forListView(new
+//		StringConverter<Function>() {
+//		
+//		@Override public String toString(Function f) { return f.toString(); }
+//		
+//		@Override public Function fromString(String fname) { return
+//		FunctionFactory.createFunction(fname); } }));
+//		
+//		lv.setOnEditCommit(new EventHandler<ListView.EditEvent<Function>>() {
+//		
+//		@Override public void handle(EditEvent<Function> event) { int idx =
+//		event.getIndex(); lv.getItems().set(idx, event.getNewValue());
+//		m_canvas.removeFunction(idx); m_canvas.addFunction(idx, event.getNewValue());
+//		} });
+		 
 	}
 
 	public BorderPane getLeft() {
@@ -171,7 +145,7 @@ public class FunctionPane extends Pane {
 			} else
 				try {
 					m_canvas.addFunction(f.get());
-					names.add(new Funs(m_canvas.functions.get(m_canvas.functions.size() - 1)));
+					names.add(m_canvas.functions.get(m_canvas.functions.size() - 1));
 				} catch (Exception e) {
 					Alert alert = new Alert(AlertType.ERROR, "Fonction Invalide");
 					alert.showAndWait();

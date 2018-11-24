@@ -36,7 +36,7 @@ public class GrapherCanvas extends Canvas {
 	protected double xmin, xmax;
 	protected double ymin, ymax;
 
-	protected Vector<Function> functions = new Vector<Function>();
+	protected Vector<Funs> functions = new Vector<Funs>();
 	protected int m_boldIndex = -1;
 
 	public GrapherCanvas(Parameters params) {
@@ -47,7 +47,7 @@ public class GrapherCanvas extends Canvas {
 		ymax = 1.5;
 
 		for (String param : params.getRaw()) {
-			functions.add(FunctionFactory.createFunction(param));
+			functions.add(new Funs(FunctionFactory.createFunction(param), this));
 		}
 		addEventHandler(MouseEvent.ANY, new Interaction(this));
 		addEventHandler(ScrollEvent.ANY, new ScrollInteraction(this));
@@ -124,15 +124,19 @@ public class GrapherCanvas extends Canvas {
 		}
 
 		double lw = gc.getLineWidth();
-		for (Function f : functions) {
+		for (Funs fn : functions) {
+			Function f = fn.getFname();
 			// y values
 			double Ys[] = new double[N];
 			for (int i = 0; i < N; i++) {
 				Ys[i] = Y(f.y(xs[i]));
 			}
 
-			if (m_boldIndex != -1 && m_boldIndex < functions.size() && functions.elementAt(m_boldIndex) == f)
+			if (m_boldIndex != -1 && m_boldIndex < functions.size() && functions.elementAt(m_boldIndex).getFname() == f)
 				gc.setLineWidth(2 * lw);
+
+			System.out.println(fn.getFcol().getValue());
+			gc.setStroke(fn.getFcol().getValue());
 			gc.strokePolyline(Xs, Ys, N);
 			gc.setLineWidth(lw);
 		}
@@ -250,37 +254,38 @@ public class GrapherCanvas extends Canvas {
 		ymax = max(y0, y1);
 		redraw();
 	}
-	
+
 	protected void drawRect(double x, double y, Point2D p) {
 		redraw();
 		GraphicsContext gc = this.getGraphicsContext2D();
 		gc.setLineDashes(2);
-		double tabX[] = {x,p.getX(),p.getX(),x,x}; 
-		double tabY[] = {p.getY(),p.getY(),y,y,p.getY()};
-		gc.strokePolyline(tabX, tabY, 5);	
+		double tabX[] = { x, p.getX(), p.getX(), x, x };
+		double tabY[] = { p.getY(), p.getY(), y, y, p.getY() };
+		gc.strokePolyline(tabX, tabY, 5);
 		gc.setLineDashes();
 	}
-	
-	protected void bold(Function fn) {
-		/*for (int i = 0; i < functions.size(); i++) {
-			if (functions.elementAt(i).toString().equals(fn))
-				m_boldIndex = i;
-		}*/
+
+	protected void bold(Funs fn) {
 		m_boldIndex = functions.indexOf(fn);
 		redraw();
 	}
 
 	protected void addFunction(String f) {
-		functions.add(FunctionFactory.createFunction(f));
+		functions.add(new Funs(FunctionFactory.createFunction(f), this));
 		redraw();
 	}
-	
+
 	protected void addFunction(int index, String f) {
-		functions.add(index, FunctionFactory.createFunction(f));
+		functions.add(index, new Funs(FunctionFactory.createFunction(f), this));
 		redraw();
 	}
-	
+
 	protected void addFunction(int index, Function fn) {
+		functions.add(index, new Funs(fn, this));
+		redraw();
+	}
+
+	protected void addFunction(int index, Funs fn) {
 		functions.add(index, fn);
 		redraw();
 	}

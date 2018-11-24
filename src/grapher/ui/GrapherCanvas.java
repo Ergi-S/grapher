@@ -263,7 +263,7 @@ public class GrapherCanvas extends Canvas {
 	
 	protected void bold(Function fn) {
 		/*for (int i = 0; i < functions.size(); i++) {
-			if (functions.elementAt(i).equals(fn))
+			if (functions.elementAt(i).toString().equals(fn))
 				m_boldIndex = i;
 		}*/
 		m_boldIndex = functions.indexOf(fn);
